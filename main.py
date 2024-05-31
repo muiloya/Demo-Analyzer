@@ -16,7 +16,7 @@ def main():
         if(file_type) == "gz":
             file_path = utils.extract_dem_from_gz(file_path)
         parser = utils.open_demo(file_path)
-        demo_process = scoreboardgenerator.ScoreboardGenerator(parser)
+        scoreboardgenerator.ScoreboardGenerator(parser)
         if(file_type) == "gz":
             utils.delete_file(file_path)
 
