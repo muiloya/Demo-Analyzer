@@ -22,15 +22,17 @@ Opening kills
 """
 
 class ScoreboardGenerator:
-    parser = None
-    scoreboard = None
-    players = None
-    round_starts = None
-    round_ends = None
-    all_round_deaths = []
 
     def __init__(self, parser):
+        ## initializ all class variables here
         self.parser = parser
+        self.scoreboard = None
+
+        self.players = None
+        self.round_starts = None
+        self.round_ends = None
+        self.all_round_deaths = []
+
         self.SetupScoreboardVariables()
         self.GenerateScoreboard()
         self.DisplayScoreboard()
@@ -47,7 +49,7 @@ class ScoreboardGenerator:
     def FilterRoundEvents(self):
         round_starts = self.parser.parse_event("round_start", other=["total_rounds_played"])
         round_ends = self.parser.parse_event("round_end", other=["total_rounds_played"])
-        
+    
         ## Need to filter out knife round, first we remove the 0th tick round from round_starts
         round_starts = round_starts[round_starts['tick'] != 0]
         ## Faceit resets server multiple times for 1st pistol, if multiple ticks for a round take the highest tick
@@ -65,7 +67,7 @@ class ScoreboardGenerator:
         max_rounds = round_ends["total_rounds_played"].max()
         deaths = self.parser.parse_event("player_death", other=["total_rounds_played"])
         deaths_headers = deaths.columns
-        
+
         ## get all deaths that occur between the start tick and end tick of a round
         for round_idx in range(0,max_rounds):
             round_deaths = pd.DataFrame(columns = deaths_headers)
@@ -78,10 +80,9 @@ class ScoreboardGenerator:
                 if is_death_in_round and has_round_started and round_hasnt_finished:
                     round_deaths = pd.concat([round_deaths, death.to_frame().T], ignore_index=True)        
             self.all_round_deaths.append(round_deaths)
-        
-    def GenerateScoreboard(self):
-        ##TODO opening kills but first solve clutches bug
 
+    def GenerateScoreboard(self):
+        ##TODO opening kills & Zeus kills
         ## Get all stats
         aggregate_stats = self.GetAggregateStats()
         rounds_won = self.GetRoundsWon()
@@ -113,7 +114,6 @@ class ScoreboardGenerator:
         return rounds_won
 
     def GetClutches(self):
-        ##TODO function works but theres a bug, it fails on the second demo.
         total_rounds_played = 0
         round_ends = self.round_ends
         clutches = self.players.copy(deep=True)
