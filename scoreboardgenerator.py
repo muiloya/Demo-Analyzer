@@ -82,16 +82,18 @@ class ScoreboardGenerator:
             self.all_round_deaths.append(round_deaths)
 
     def GenerateScoreboard(self):
-        ##TODO opening kills & Zeus kills
+        ##TODO opening kills
         ## Get all stats
         aggregate_stats = self.GetAggregateStats()
         rounds_won = self.GetRoundsWon()
         clutches = self.GetClutches()
+        zeus_kills = self.GetZeusKills()
 
         ## Merge in preferred order
         scoreboard = pd.merge(self.players,rounds_won, on="name")
         scoreboard = pd.merge(scoreboard,aggregate_stats, on = "name")
         scoreboard = pd.merge(scoreboard,clutches,on="name")
+        scoreboard = pd.merge(scoreboard,zeus_kills,on="name")
 
         ## Sort and return
         scoreboard = scoreboard.sort_values(by=['team_rounds_total', 'kills_total'], ascending=[False, False])
@@ -138,6 +140,16 @@ class ScoreboardGenerator:
                     clutches.loc[clutches['name'] == name, '1vsX'] += 1
                     break
         return clutches
+    
+    def GetZeusKills(self):
+        zeus_kills = self.players.copy(deep=True)
+        zeus_kills['Zeus Kills'] = 0
+        deaths = self.parser.parse_event("player_death", other=["total_rounds_played"])
+        zeus_deaths = deaths[deaths["weapon"] == "taser"]
+        for _, zeus_death in zeus_deaths.iterrows():
+            name = zeus_death["attacker_name"]
+            zeus_kills.loc[zeus_kills['name'] == name, 'Zeus Kills'] += 1
+        return zeus_kills
 
     def DisplayScoreboard(self):
         show(self.scoreboard)
