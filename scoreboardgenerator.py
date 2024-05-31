@@ -1,6 +1,5 @@
 import pandas as pd
 from pandasgui import show
-import time
 
 """
 TODO:
@@ -33,6 +32,7 @@ class ScoreboardGenerator:
         self.round_starts = None
         self.round_ends = None
         self.all_round_deaths = []
+
         self.SetupScoreboardVariables()
         self.GenerateScoreboard()
         self.DisplayScoreboard()
