@@ -118,8 +118,8 @@ class ScoreboardGenerator:
         round_ends = self.round_ends
         clutches = self.players.copy(deep=True)
         clutches['1vsX'] = 0
+        is_alive_df = self.parser.parse_ticks(["is_alive", "team_name"])
         for round_deaths in self.all_round_deaths:
-            is_alive_df = self.parser.parse_ticks(["is_alive", "team_name", "team_rounds_total"], ticks=round_deaths["tick"].to_list())
             total_rounds_played += 1
             for _, death in round_deaths.iterrows():
                 is_alive_in_round_df = is_alive_df[is_alive_df["tick"] == death["tick"]]
