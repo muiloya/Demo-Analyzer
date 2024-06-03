@@ -88,12 +88,14 @@ class ScoreboardGenerator:
         rounds_won = self.GetRoundsWon()
         clutches = self.GetClutches()
         zeus_kills = self.GetZeusKills()
+        opening_kills = self.GetOpeningKills()
 
         ## Merge in preferred order
-        scoreboard = pd.merge(self.players,rounds_won, on="name")
+        scoreboard = pd.merge(self.players,rounds_won, on ="name")
         scoreboard = pd.merge(scoreboard,aggregate_stats, on = "name")
-        scoreboard = pd.merge(scoreboard,clutches,on="name")
-        scoreboard = pd.merge(scoreboard,zeus_kills,on="name")
+        scoreboard = pd.merge(scoreboard,opening_kills,on = "name")
+        scoreboard = pd.merge(scoreboard,clutches,on ="name")
+        scoreboard = pd.merge(scoreboard,zeus_kills,on ="name")
 
         ## Sort and return
         scoreboard = scoreboard.sort_values(by=['team_rounds_total', 'kills_total'], ascending=[False, False])
@@ -150,6 +152,15 @@ class ScoreboardGenerator:
             name = zeus_death["attacker_name"]
             zeus_kills.loc[zeus_kills['name'] == name, 'Zeus Kills'] += 1
         return zeus_kills
+    
+    def GetOpeningKills(self):
+        opening_kills = self.players.copy(deep=True)
+        opening_kills['Opening Kills'] = 0
+        for round_deaths in self.all_round_deaths:
+            opening_duel = round_deaths.iloc[0]
+            opening_success_name = opening_duel["attacker_name"]
+            opening_kills.loc[opening_kills['name'] == opening_success_name, 'Opening Kills'] += 1
+        return opening_kills
 
     def DisplayScoreboard(self):
         show(self.scoreboard)
