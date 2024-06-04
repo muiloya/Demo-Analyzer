@@ -82,7 +82,6 @@ class ScoreboardGenerator:
             self.all_round_deaths.append(round_deaths)
 
     def GenerateScoreboard(self):
-        ##TODO opening kills
         ## Get all stats
         aggregate_stats = self.GetAggregateStats()
         rounds_won = self.GetRoundsWon()
@@ -165,3 +164,5 @@ class ScoreboardGenerator:
     def DisplayScoreboard(self):
         show(self.scoreboard)
 
+    def ExportScoreboardToCSV(self):
+        self.scoreboard.to_csv("output.csv", header = False, index = False)
